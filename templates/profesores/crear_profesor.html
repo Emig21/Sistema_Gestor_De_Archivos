@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Crear Profesor</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form_persona.as_p }}
+    {{ form_usuario.as_p }}
+    <button type="submit" class="btn btn-success">Guardar</button>
+</form>
+<a href="{% url 'estudiantes' %}" class="btn btn-secondary">Cancelar</a>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'crear_estudiante' %}">Nuevo Estudiante</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'crear_curso' %}">Nuevo Curso</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'crear_persona' %}">Nueva Persona</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'crear_profesor' %}">Nuevo Profesor</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'crear_padre' %}">Nuevo Padre</a>
+</li>
+{% endblock %}
+
+{% block body %}
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Fecha de Nacimiento</th>
+            <th>Padre</th>
+            <th>Curso</th>
+            <th>Dirección</th>
+            <th>Ciudad</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for estudiante in estudiantes %}
+        <tr>
+            <td>{{ estudiante.persona.nombre }}</td>
+            <td>{{ estudiante.fecha_nacimiento }}</td>
+            <td>{{ estudiante.id_padre.persona.nombre }}</td>
+            <td>{{ estudiante.id_curso.nombre }}</td>
+            <td>{{ estudiante.direccion }}</td>
+            <td>{{ estudiante.ciudad }}</td>
+            <td><a href="{% url 'editar_estudiante' pk=estudiante.id %}">Editar</a></td>
+            <td><a href="{% url 'eliminar_estudiante' pk=estudiante.id %}">Eliminar</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
