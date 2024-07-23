@@ -1,0 +1,14 @@
+body {
+    background-color:rgb(202, 200, 199);
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    height: 100vh; 
+
+}
+.card-title-no-margin {
+    margin: 0;
+    padding: 1rem;
+    background-color: #ff6f61; /* Puedes ajustar el color de fondo aquí */
+    color: white;
+}

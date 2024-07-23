@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.forms import AuthenticationForm
 from .models import *
 
 class FormularioEstudiante(forms.ModelForm):
@@ -13,9 +14,6 @@ class FormularioEstudiante(forms.ModelForm):
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
             'ciudad': forms.TextInput(attrs={'class': 'form-control'}),
         }
-
-   
-
 
 class FormularioCurso(forms.ModelForm):
     class Meta:
@@ -37,25 +35,46 @@ class FormularioPersona(forms.ModelForm):
         }
 
 class FormularioUsuario(forms.ModelForm):
+    contraseña = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label='Contraseña')
+    confirm_contraseña = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label='Confirmar contraseña')
+    es_superusuario = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}), label='Es superusuario')
+    es_activo = forms.BooleanField(required=False, initial=True, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}), label='Está activo')
+    es_personal = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}), label='Es personal')
+
     class Meta:
         model = Usuario
-        fields = ['username', 'password']
+        fields = ['username', 'contraseña', 'confirm_contraseña', 'es_superusuario', 'es_activo', 'es_personal']
+        labels = {
+            'username': 'Nombre de usuario',
+        }
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'password': forms.PasswordInput(attrs={'class': 'form-control'}),
+            'contraseña': forms.PasswordInput(attrs={'class': 'form-control'}),
+            'confirm_contraseña': forms.PasswordInput(attrs={'class': 'form-control'}),
+            'es_superusuario': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'es_activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'es_personal': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        contraseña = cleaned_data.get("contraseña")
+        confirm_contraseña = cleaned_data.get("confirm_contraseña")
+
+        if contraseña != confirm_contraseña:
+            raise forms.ValidationError("Las contraseñas no coinciden")
+
+        return cleaned_data
 
 class FormularioRol(forms.ModelForm):
     class Meta:
         model = Rol
         fields = ['nombre_rol']
         widgets = {
-            'nombre_rol': forms.Select(attrs={'class': 'form-control'}),
+            'nombre_rol': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 class FormularioPadre(forms.ModelForm):
-    
-    
     class Meta:
         model = Padre
         fields = ['persona', 'direccion', 'ciudad']
@@ -65,3 +84,10 @@ class FormularioPadre(forms.ModelForm):
             'ciudad': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
+class FormularioLogin(AuthenticationForm):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su usuario'})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'})
+    )
