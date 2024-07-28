@@ -8,7 +8,6 @@ function loadHTML(elementId, url) {
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
-    loadHTML('navbar', '../templates/cabecera.html');
-    loadHTML('sidebar', '../templates/barraLateral.html');
-    loadHTML('footer', '../templates/pieDePagina.html');
+    loadHTML('navbar', '../templates/cabecera.php');
+    loadHTML('sidebar', '../templates/barraLateral.php');
 });
