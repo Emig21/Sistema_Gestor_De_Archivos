@@ -14,7 +14,6 @@ class Usuarios {
 
     public function obtenerUsuarios() {
         try {
-            // Llamar a la función seleccionar_usuarios que retorna el campo 'id'
             $sql = "SELECT * FROM seleccionar_usuarios()";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
@@ -28,7 +27,7 @@ class Usuarios {
     public function generarFilasUsuarios() {
         $usuarios = $this->obtenerUsuarios();
         $filas = '';
-        
+    
         if (!empty($usuarios)) {
             foreach ($usuarios as $usuario) {
                 $filas .= '<tr>';
@@ -36,6 +35,7 @@ class Usuarios {
                 $filas .= '<td>' . htmlspecialchars($usuario['tipo_usuario']) . '</td>';
                 $filas .= '<td>********</td>';
                 $filas .= '<td class="text-center">';
+                $filas .= '<button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEditarUsuario" data-id="' . $usuario['id'] . '" data-nombre="' . htmlspecialchars($usuario['nombre']) . '" data-tipo="' . $usuario['tipo_usuario'] . '">Editar</button> ';
                 $filas .= '<button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalConfirmarEliminar" data-id="' . $usuario['id'] . '">Eliminar</button>';
                 $filas .= '</td>';
                 $filas .= '</tr>';
@@ -45,9 +45,10 @@ class Usuarios {
             $filas .= '<td colspan="4" class="text-center">No hay usuarios disponibles</td>';
             $filas .= '</tr>';
         }
-        
+    
         return $filas;
     }
+    
 
     public function crearUsuario($nombre, $tipo_usuario_id, $contrasena) {
         try {
@@ -66,6 +67,26 @@ class Usuarios {
             return 'Error: ' . $e->getMessage();
         }
     }
+
+    public function actualizarUsuario($id, $nombre, $tipo_usuario_id, $contrasena) {
+        try {
+            $sql = "UPDATE public.usuario SET nombre = :nombre, tipo_usuario_id = :tipo_usuario_id, contraseña = :contrasena WHERE id = :id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':nombre', $nombre);
+            $stmt->bindParam(':tipo_usuario_id', $tipo_usuario_id);
+            $stmt->bindParam(':contrasena', $contrasena);
+    
+            if ($stmt->execute()) {
+                header('Location: ../class/usuarios.php');
+            } else {
+                return "Error al actualizar el usuario.";
+            }
+        } catch (PDOException $e) {
+            return 'Error: ' . $e->getMessage();
+        }
+    }
+    
 
     public function __destruct() {
         $this->conn = null;
@@ -138,4 +159,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'], $_POST['tip
         echo 'Error: ' . $e->getMessage();
     }
 }
+
+// Actualizar un usuario
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_id'], $_POST['editar_nombre'], $_POST['editar_tipo_usuario'], $_POST['editar_contraseña'])) {
+    $id = $_POST['editar_id'];
+    $nombre = $_POST['editar_nombre'];
+    $tipo_usuario_id = $_POST['editar_tipo_usuario'];
+    $contrasena = $_POST['editar_contraseña'];
+
+    // Verifica que los valores no estén vacíos
+    if (!empty($id) && !empty($nombre) && !empty($tipo_usuario_id) && !empty($contrasena)) {
+        try {
+            $usuarios = new Usuarios();
+            $mensaje = $usuarios->actualizarUsuario($id, $nombre, $tipo_usuario_id, $contrasena);
+            echo $mensaje;
+        } catch (Exception $e) {
+            echo 'Error: ' . $e->getMessage();
+        }
+    } else {
+        echo 'Todos los campos son obligatorios.';
+    }
+}
+
 ?>

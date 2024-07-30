@@ -22,20 +22,17 @@
                 </li>
                 <li class="list-item">
                     <i class="list-item-icon fas fa-archive"></i>
+                    <i class=""></i>
                     <a class="text-light text-decoration-none fw-bold" href="../class/categorias.php">Categorías</a>
                 </li>
-                <li class="list-item">
-                    <i class="list-item-icon fas fa-user-graduate"></i>
-                    <a class="text-light text-decoration-none fw-bold" href="../class/reportes.php">Reportes</a>
-                </li>
-            <?php endif; ?>
                 <li class="list-item">
                     <i class="list-item-icon fas fa-file-pdf"></i>
                     <a class="text-light text-decoration-none fw-bold" href="../class/documentos.php">Documentos</a>
                 </li>
+            <?php endif; ?>
                 <li class="list-item">
-                    <i class="list-item-icon fas fa-users"></i>
-                    <a class="text-light text-decoration-none fw-bold" href="../class/Estudiantes.php">Estudiantes</a>
+                    <i class="list-item-icon fas fa-file-medical"></i>
+                    <a class="text-light text-decoration-none fw-bold" href="../class/crear_documento.php">Nuevo Documento</a>
                 </li>
         </ul>
     </div>

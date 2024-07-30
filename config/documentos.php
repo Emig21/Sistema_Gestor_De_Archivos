@@ -149,10 +149,87 @@ class Documentos {
         }
     }
 
+    public function obtenerReporteDiario($fecha) {
+        try {
+            $stmt = $this->conn->prepare('SELECT * FROM generar_reporte_diario(:fecha)');
+            $stmt->bindParam(':fecha', $fecha);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo 'Error: ' . $e->getMessage();
+            return [];
+        }
+    }
+
+    public function obtenerReporteMensual($fecha) {
+        try {
+            $stmt = $this->conn->prepare('SELECT * FROM generar_reporte_mensual(:fecha)');
+            $stmt->bindParam(':fecha', $fecha);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo 'Error: ' . $e->getMessage();
+            return [];
+        }
+    }
 
     public function __destruct() {
         $this->conn = null;
     }
+}
+
+class DocumentosPorCategoria {
+    private $conn;
+
+    public function __construct() {
+        $conexion = new Conexion();
+        $this->conn = $conexion->conectar();
+        if ($this->conn === null) {
+            throw new Exception('No se pudo establecer la conexión a la base de datos.');
+        }
+    }
+
+    public function obtenerDocumentosPorCategoria($categoria_id) {
+        try {
+            $stmt = $this->conn->prepare('SELECT titulo, descripcion, ruta_archivo, fecha_creacion FROM documentos WHERE categoria_id = :categoria_id');
+            $stmt->bindParam(':categoria_id', $categoria_id, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo 'Error: ' . $e->getMessage();
+            return [];
+        }
+    }
+
+    public function __destruct() {
+        $this->conn = null;
+    }
+}
+
+if (isset($_GET['tipo']) && isset($_GET['fecha'])) {
+    $tipo = $_GET['tipo'];
+    $fecha = $_GET['fecha'];
+    
+    $documentos = new Documentos();
+
+    if ($tipo == 'diario') {
+        $data = $documentos->obtenerReporteDiario($fecha);
+    } elseif ($tipo == 'mensual') {
+        $data = $documentos->obtenerReporteMensual($fecha);
+    } else {
+        die("Tipo de reporte no válido.");
+    }
+
+    echo json_encode($data);
+}
+
+if (isset($_GET['categoria_id'])) {
+    $categoria_id = $_GET['categoria_id'];
+    
+    $documentosPorCategoria = new DocumentosPorCategoria();
+    $data = $documentosPorCategoria->obtenerDocumentosPorCategoria($categoria_id);
+
+    echo json_encode($data);
 }
 
 // Manejar la solicitud de eliminación
@@ -165,7 +242,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['ac
         echo 'Error al eliminar el documento';
     }
 }
-
-
-
 ?>

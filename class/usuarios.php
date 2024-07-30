@@ -17,6 +17,16 @@
     <link rel="stylesheet" href="../includes/css/principal.css">
     <link rel="stylesheet" href="../includes/css/components.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+    <style>
+        table.dataTable {
+            border: 1px solid #dee2e6;
+        }
+        table.dataTable th,
+        table.dataTable td {
+            border: 1px solid #dee2e6;
+        }
+    </style>
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
     <div id="navbar"></div>
@@ -28,7 +38,8 @@
                     <h2 class="m-0">Usuarios</h2>
                     <button class="btn btn-success" id="agregar_usuario" data-toggle="modal" data-target="#modalCrearUsuario">Agregar Usuario</button>
                 </div>
-                <table class="table table-bordered table-light">
+                <br>
+                <table id="usuariosTable" class="table table-bordered table-striped table-light">
                     <thead class="thead-dark">
                         <tr>
                             <th scope="col">Nombre del Usuario</th>
@@ -80,6 +91,42 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalEditarUsuario" tabindex="-1" role="dialog" aria-labelledby="modalEditarUsuarioLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditarUsuarioLabel">Editar Usuario</h5>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarUsuario" action="../config/usuarios.php" method="POST">
+                    <input type="hidden" id="editar_id" name="editar_id">
+                    <div class="form-group">
+                        <label for="editar_nombre">Nombre</label>
+                        <input type="text" class="form-control" id="editar_nombre" name="editar_nombre" required>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="editar_tipo_usuario">Tipo de Usuario</label>
+                        <select class="form-control" id="editar_tipo_usuario" name="editar_tipo_usuario" required>
+                            <?php foreach ($tipos as $tipo): ?>
+                                <option value="<?php echo $tipo['id']; ?>"><?php echo $tipo['nombre']; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="editar_contraseña">Contraseña</label>
+                        <input type="password" class="form-control" id="editar_contraseña" name="editar_contraseña" required>
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
     <!-- Modal para Confirmar Eliminación -->
     <div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" role="dialog" aria-labelledby="modalConfirmarEliminarLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -106,20 +153,45 @@
     </footer>
 
     <script src="../includes/js/componentes.js"></script>
-    <!-- Incluir jQuery, Popper.js y Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
     <script>
-    $(document).ready(function() {
-        $('#modalConfirmarEliminar').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var userId = button.data('id');
-            var modal = $(this);
-            modal.find('#idEliminarUsuario').val(userId);
-        });
+$(document).ready(function() {
+    $('#modalEditarUsuario').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // Botón que abrió el modal
+        var id = button.data('id'); // Extraer la información de los atributos data-*
+        var nombre = button.data('nombre');
+        var tipo = button.data('tipo');
+
+        // Actualizar los valores del modal
+        var modal = $(this);
+        modal.find('#editar_id').val(id);
+        modal.find('#editar_nombre').val(nombre);
+        modal.find('#editar_tipo_usuario').val(tipo);
     });
-    </script>
+
+    $('#modalConfirmarEliminar').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var userId = button.data('id');
+        var modal = $(this);
+        modal.find('#idEliminarUsuario').val(userId);
+    });
+
+    $('#usuariosTable').DataTable({
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json"
+        }
+    });
+});
+</script>
+
 </body>
 </html>
