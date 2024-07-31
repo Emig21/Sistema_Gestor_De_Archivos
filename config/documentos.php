@@ -151,27 +151,52 @@ class Documentos {
 
     public function obtenerReporteDiario($fecha) {
         try {
+            // Ejecutar la función PostgreSQL
             $stmt = $this->conn->prepare('SELECT * FROM generar_reporte_diario(:fecha)');
             $stmt->bindParam(':fecha', $fecha);
             $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            // Obtener los nombres de las categorías
+            foreach ($result as &$documento) {
+                $stmt_cat = $this->conn->prepare('SELECT nombre_categoria FROM categorias WHERE categoria_id = :categoria_id');
+                $stmt_cat->bindParam(':categoria_id', $documento['categoria_id']);
+                $stmt_cat->execute();
+                $categoria = $stmt_cat->fetch(PDO::FETCH_ASSOC);
+                $documento['categoria'] = $categoria ? $categoria['nombre_categoria'] : 'Sin categoría';
+            }
+    
+            return $result;
         } catch (PDOException $e) {
             echo 'Error: ' . $e->getMessage();
             return [];
         }
     }
-
+    
     public function obtenerReporteMensual($fecha) {
         try {
+            // Ejecutar la función PostgreSQL
             $stmt = $this->conn->prepare('SELECT * FROM generar_reporte_mensual(:fecha)');
             $stmt->bindParam(':fecha', $fecha);
             $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            // Obtener los nombres de las categorías
+            foreach ($result as &$documento) {
+                $stmt_cat = $this->conn->prepare('SELECT nombre_categoria FROM categorias WHERE categoria_id = :categoria_id');
+                $stmt_cat->bindParam(':categoria_id', $documento['categoria_id']);
+                $stmt_cat->execute();
+                $categoria = $stmt_cat->fetch(PDO::FETCH_ASSOC);
+                $documento['categoria'] = $categoria ? $categoria['nombre_categoria'] : 'Sin categoría';
+            }
+    
+            return $result;
         } catch (PDOException $e) {
             echo 'Error: ' . $e->getMessage();
             return [];
         }
     }
+    
 
     public function __destruct() {
         $this->conn = null;

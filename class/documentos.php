@@ -158,45 +158,48 @@ $documentos = new Documentos();
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
     <script>
-        function mostrarReporte(tipo) {
-            let modalId = tipo === 'diario' ? '#reporteDiarioModal' : '#reporteMensualModal';
-            let tablaId = tipo === 'diario' ? '#reporteDiarioBody' : '#reporteMensualBody';
-            let fecha = new Date().toISOString().split('T')[0];
+       function mostrarReporte(tipo) {
+    let modalId = tipo === 'diario' ? '#reporteDiarioModal' : '#reporteMensualModal';
+    let tablaId = tipo === 'diario' ? '#reporteDiarioBody' : '#reporteMensualBody';
+    let fecha = new Date().toISOString().split('T')[0];
 
-            if (tipo === 'mensual') {
-                let fechaObj = new Date();
-                fecha = new Date(fechaObj.getFullYear(), fechaObj.getMonth(), 1).toISOString().split('T')[0];
-            }
+    if (tipo === 'mensual') {
+        let fechaObj = new Date();
+        fecha = new Date(fechaObj.getFullYear(), fechaObj.getMonth(), 1).toISOString().split('T')[0];
+    }
 
-            $.ajax({
-                url: '../config/documentos.php',
-                method: 'GET',
-                data: {
-                    tipo: tipo,
-                    fecha: fecha
-                },
-                success: function(response) {
-                    let documentos = JSON.parse(response);
-                    let filas = '';
+    $.ajax({
+        url: '../config/documentos.php',
+        method: 'GET',
+        data: {
+            tipo: tipo,
+            fecha: fecha
+        },
+        success: function(response) {
+            let documentos = JSON.parse(response);
+            console.log("Datos recibidos:", documentos); // Depuración: verificar los datos recibidos
+            let filas = '';
 
-                    documentos.forEach(function(doc) {
-                        filas += `<tr>
-                            <td>${doc.titulo}</td>
-                            <td>${doc.descripcion}</td>
-                            <td>${doc.categoria}</td>
-                            <td><a href="${doc.ruta_archivo}" target="_blank">Ver Documento</a></td>
-                            <td>${doc.fecha}</td>
-                        </tr>`;
-                    });
-
-                    $(tablaId).html(filas);
-                    $(modalId).modal('show');
-                },
-                error: function() {
-                    alert('Error al obtener el reporte');
-                }
+            documentos.forEach(function(doc) {
+                let categoria = doc.categoria ? doc.categoria : 'Sin categoría'; // Asegurarse de que la categoría esté definida
+                filas += `<tr>
+                    <td>${doc.titulo}</td>
+                    <td>${doc.descripcion}</td>
+                    <td>${categoria}</td>
+                    <td><a href="${doc.ruta_archivo}" target="_blank">Ver Documento</a></td>
+                    <td>${doc.fecha}</td>
+                </tr>`;
             });
+
+            $(tablaId).html(filas);
+            $(modalId).modal('show');
+        },
+        error: function() {
+            alert('Error al obtener el reporte');
         }
+    });
+}
+
     </script>
 
     <script>
